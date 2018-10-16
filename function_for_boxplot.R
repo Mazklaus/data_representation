@@ -15,6 +15,7 @@ library(ggpubr)
 # values_name to the name in character/numeric of the values column
 # group_name to the name in character/numeric of the group column
 # two_group indicate if you have two or more group in the dataset
+# notched indicate if you prefer notch plot rather than boxplot
 
 imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = FALSE){
   
@@ -33,6 +34,16 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
     stop("group column must be a vectorType")
   }
   
+  if( !is.logical(two_group) ){
+    stop("two_group parameter must a logical")
+  }
+  
+  if( !is.logical(notched) ){
+    stop("notched parameter must a logical")
+  }
+  
+  ## Create boxplot
+  
   if(two_group){
   
     varres <- var.test(data[,values_name][data[,group_name] == 0], data[,values_name][data[,group_name] ==1])[[3]]
@@ -42,7 +53,7 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
       tres <- FALSE
     }
     
-    box_comp <- ggplot(data, aes(group,values, color = group)) +
+    box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
       theme_light() +
       geom_boxplot(notch = notched) +
       geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
@@ -52,7 +63,7 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
     
     my_comparison <- combn(unique(as.character(data[,group_name])),2,simplify = FALSE)
     
-    box_comp <- ggplot(data, aes(group,values, color = group)) +
+    box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
       theme_light() +
       geom_boxplot(notch = notched) +
       geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
@@ -65,6 +76,102 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
   
   return(box_comp)
 }
+
+#==============================#
+##### Violin plot function #####
+#==============================#
+
+# data corresponding to the dataset
+# values_name to the name in character/numeric of the values column
+# group_name to the name in character/numeric of the group column
+# two_group indicate if you have two or more group in the dataset
+# box indicate if you want to add a boxplot inside the violin
+
+imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE){
+  
+  # Loading the require package if not
+  
+  require(ggplot2)
+  require(ggpubr)
+  
+  ## check input parameters ##
+  
+  if(!is.data.frame(data)){
+    stop("data parameters must be a dataFrame")
+  }
+  
+  if(!is.factor(data[,group_name])){
+    stop("group column must be a vectorType")
+  }
+  
+  if( !is.logical(two_group) ){
+    stop("two_group parameter must a logical")
+  }
+  
+  if( !is.logical(box) ){
+    stop("box parameter must a logical")
+  }
+  
+  ## Create violin plot
+  
+  if(two_group){
+    
+    varres <- var.test(data[,values_name][data[,group_name] == 0], data[,values_name][data[,group_name] ==1])[[3]]
+    if (varres > 0.05 ){
+      tres <- TRUE
+    } else {
+      tres <- FALSE
+    }
+    
+    if(box){
+      
+      vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
+        theme_light() +
+        geom_violin() +
+        geom_boxplot(width = 0.1) +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
+        stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
+      
+    } else {
+      
+      vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
+        theme_light() +
+        geom_violin() +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
+        stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
+      
+    }
+  } else {
+    
+    my_comparison <- combn(unique(as.character(data[,group_name])),2,simplify = FALSE)
+    
+    if(box) {
+      
+      vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
+        theme_light() +
+        geom_violin() +
+        geom_boxplot(width = 0.1) +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
+        stat_compare_means(method = "t.test", comparisons = my_comparison) +
+        stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
+    
+    } else {
+      
+      vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
+        theme_light() +
+        geom_violin() +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
+        stat_compare_means(method = "t.test", comparisons = my_comparison) +
+        stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
+    }
+          
+    print("The t-test done between each group do not take account of a variance test, thus it might be interpreted carefully.",col = "red")
+    
+  }
+  
+  return(vio_comp)
+}
+
 
 #============================#
 ##### Data set generator #####
