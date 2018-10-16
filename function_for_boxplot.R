@@ -38,8 +38,21 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
   ## recuperation of the labels
   
   if(is.character(values_name)){name_y <- values_name} else {name_y <- colnames(data)[values_name]}
-  if(is.character(group_name)){name_x <- group_name} else {name_x <- colnames(data)[group_name]}
-
+  if(is.character(group_name)){
+    name_x <- group_name
+    name_l <- group_name
+  } else {
+      name_x <- colnames(data)[group_name]
+      name_l <- colnames(data)[group_name]
+      }
+  if(aditional_grouping){
+    if(is.character(aditional_grouping_name)){
+      name_l <- aditional_grouping_name
+    } else {
+      name_l <- colnames(data)[aditional_grouping_name]
+    }
+  }
+  
   ## Create boxplot
   
   if(two_group){
@@ -50,9 +63,10 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
       
       box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name]),ylab("values")) +
         theme_light() +
+        scale_color_discrete(name_l) +
         xlab(name_x) +
         ylab(name_y) +
-        scale_fill_discrete(name="Experimental\nCondition") +
+        labs(fill = name_l) +
         geom_boxplot(notch = notched) +
         geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75)) +
         stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
@@ -60,8 +74,10 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
       
       box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name]),ylab("values")) +
         theme_light() +
+        scale_color_discrete(name_l) +
         xlab(name_x) +
         ylab(name_y) +
+        labs(fill = name_l) +
         geom_boxplot(notch = notched) +
         geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
         stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
@@ -74,8 +90,10 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
       
       box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
         theme_light() +
+        scale_color_discrete(name_l) +
         xlab(name_x) +
         ylab(name_y) +
+        labs(fill = name_l) +
         geom_boxplot(notch = notched) +
         geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75)) +
         stat_compare_means(method = "t.test", comparisons = my_comparison) +
@@ -84,8 +102,10 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
       
       box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
         theme_light() +
+        scale_color_discrete(name_l) +
         xlab(name_x) +
         ylab(name_y) +
+        labs(fill = name_l) +
         geom_boxplot(notch = notched) +
         geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
         stat_compare_means(method = "t.test", comparisons = my_comparison) +
@@ -106,7 +126,7 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
 # two_group indicate if you have two or more group in the dataset
 # box indicate if you want to add a boxplot inside the violin
 
-imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE, aditional_grouping = FALSE, aditional_grouping_name = NA){
+imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE, aditional_grouping = FALSE, aditional_grouping_name = NA){
   
   # Loading the require package if not
   
@@ -127,7 +147,20 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
   ## recuperation of the labels
   
   if(is.character(values_name)){name_y <- values_name} else {name_y <- colnames(data)[values_name]}
-  if(is.character(group_name)){name_x <- group_name} else {name_x <- colnames(data)[group_name]}
+  if(is.character(group_name)){
+    name_x <- group_name
+    name_l <- group_name
+  } else {
+    name_x <- colnames(data)[group_name]
+    name_l <- colnames(data)[group_name]
+  }
+  if(aditional_grouping){
+    if(is.character(aditional_grouping_name)){
+      name_l <- aditional_grouping_name
+    } else {
+      name_l <- colnames(data)[aditional_grouping_name]
+    }
+  }
   
   ## Create violin plot
   
@@ -141,6 +174,8 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
         
         vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
           theme_light() +
+          scale_color_discrete(name_l) +
+          labs(fill = name_l) +
           xlab(name_x) +
           ylab(name_y) +
           geom_violin() +
@@ -151,6 +186,8 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
         
         vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
           theme_light() +
+          scale_color_discrete(name_l) +
+          labs(fill = name_l) +
           xlab(name_x) +
           ylab(name_y) +
           geom_violin() +
@@ -162,6 +199,8 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
         
         vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
           theme_light() +
+          scale_color_discrete(name_l) +
+          labs(fill = name_l) +
           xlab(name_x) +
           ylab(name_y) +
           geom_violin() +
@@ -172,6 +211,8 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
         
         vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
           theme_light() +
+          scale_color_discrete(name_l) +
+          labs(fill = name_l) +
           xlab(name_x) +
           ylab(name_y) +
           geom_violin() +
@@ -188,6 +229,8 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
         
         vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
           theme_light() +
+          scale_color_discrete(name_l) +
+          labs(fill = name_l) +
           xlab(name_x) +
           ylab(name_y) +
           geom_violin() +
@@ -200,6 +243,8 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
         
         vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
           theme_light() +
+          scale_color_discrete(name_l) +
+          labs(fill = name_l) +
           xlab(name_x) +
           ylab(name_y) +
           geom_violin() +
@@ -212,6 +257,8 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
         
         vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
           theme_light() +
+          scale_color_discrete(name_l) +
+          labs(fill = name_l) +
           xlab(name_x) +
           ylab(name_y) +
           geom_violin() +
@@ -224,6 +271,8 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
         
         vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
           theme_light() +
+          scale_color_discrete(name_l) +
+          labs(fill = name_l) +
           xlab(name_x) +
           ylab(name_y) +
           geom_violin() +
@@ -235,7 +284,6 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = FALSE
     print("The t-test done between each group do not take account of a variance test, thus it might be interpreted carefully.",col = "red")
     
   }
-  
   return(vio_comp)
 }
 
