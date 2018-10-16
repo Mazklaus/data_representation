@@ -66,7 +66,7 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
 #============================#
 
 
-dataG <- function(nrow, ngroup = 2, groupAsFactor = TRUE){
+dataG <- function(nrow, ngroup = 2, groupAsFactor = TRUE, forceDif = FALSE){
   
   # check parameters
   
@@ -79,12 +79,24 @@ dataG <- function(nrow, ngroup = 2, groupAsFactor = TRUE){
   }
   
   if( !is.logical(groupAsFactor) ){
-    stop("groupAsFactor parameters must a logical")
+    stop("groupAsFactor parameter must a logical")
+  }
+  
+  if( !is.logical(forceDif) ){
+    stop("forceDif parameter must a logical")
   }
   
   # creation of the dataset
   
   df <- data.frame(values = runif(nrow), group = sample(seq(0,(ngroup-1)), replace=TRUE, size=nrow))
+  
+  if(forceDif){
+    
+    for(i in seq(0,(ngroup-1))){
+      df[which(df$group == i),]$values <- df[which(df$group == i),]$values * (runif(1)*10)
+    }
+    
+  }
   
   if(groupAsFactor){
     df$group <- as.factor(df$group)
