@@ -4,19 +4,24 @@
 
 library(ggplot2)
 library(ggpubr)
-library(gridExtra)
-library(cowplot)
+#library(gridExtra)
+#library(cowplot)
 
 #===========================#
 ##### Box plot function #####
 #===========================#
 
 # data corresponding to the dataset
-# values_name to the name in character of the values column
-# group_name to the name in character of the group column
+# values_name to the name in character/numeric of the values column
+# group_name to the name in character/numeric of the group column
 # two_group indicate if you have two or more group in the dataset
 
 imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = FALSE){
+  
+  # Loading the require package if not
+  
+  require(ggplot2)
+  require(ggpubr)
   
   ## check input parameters ##
   
