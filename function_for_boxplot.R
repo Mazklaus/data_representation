@@ -1,11 +1,49 @@
-#==========================#
-##### Packages loading #####
-#==========================#
+#============================#
+##### Utilitary function #####
+#============================#
 
-library(ggplot2)
-library(ggpubr)
-#library(gridExtra)
-#library(cowplot)
+basePlot <- function(data,values_name,group_name, aditional_grouping = FALSE, aditional_grouping_name = NA){
+  
+  ## recuperation of the labels
+  
+  if(is.character(values_name)){name_y <- values_name} else {name_y <- colnames(data)[values_name]}
+  if(is.character(group_name)){
+    name_x <- group_name
+    name_l <- group_name
+  } else {
+    name_x <- colnames(data)[group_name]
+    name_l <- colnames(data)[group_name]
+  }
+  if(aditional_grouping){
+    if(is.character(aditional_grouping_name)){
+      name_l <- aditional_grouping_name
+    } else {
+      name_l <- colnames(data)[aditional_grouping_name]
+    }
+  }
+  
+  ## Generation of the comon plot spine
+  
+  if(aditional_grouping){
+  
+  basep <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
+    theme_light() +
+    scale_color_discrete(name_l) +
+    xlab(name_x) +
+    ylab(name_y) +
+    labs(fill = name_l)
+  } else {
+    
+    basep <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
+      theme_light() +
+      scale_color_discrete(name_l) +
+      xlab(name_x) +
+      ylab(name_y) +
+      labs(fill = name_l)
+  }
+  
+  return(basep)
+}
 
 #===========================#
 ##### Box plot function #####
@@ -35,22 +73,12 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
     if(!is.factor(data[,aditional_grouping_name])){stop("aditional_grouping parameter must be a factor")}
   }
   
-  ## recuperation of the labels
+  ## generation of the spine of the plot
   
-  if(is.character(values_name)){name_y <- values_name} else {name_y <- colnames(data)[values_name]}
-  if(is.character(group_name)){
-    name_x <- group_name
-    name_l <- group_name
-  } else {
-      name_x <- colnames(data)[group_name]
-      name_l <- colnames(data)[group_name]
-      }
   if(aditional_grouping){
-    if(is.character(aditional_grouping_name)){
-      name_l <- aditional_grouping_name
-    } else {
-      name_l <- colnames(data)[aditional_grouping_name]
-    }
+  box_comp <- basePlot(data,values_name,group_name, aditional_grouping = TRUE, aditional_grouping_name = aditional_grouping_name)
+  } else {
+  box_comp <- basePlot(data,values_name,group_name, aditional_grouping = FALSE, aditional_grouping_name = NA)
   }
   
   ## Create boxplot
@@ -59,58 +87,20 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
     varres <- var.test(data[,values_name][data[,group_name] == 0], data[,values_name][data[,group_name] ==1])[[3]]
     if (varres > 0.05 ){tres <- TRUE} else {tres <- FALSE}
     
-    if(aditional_grouping){
-      
-      box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name]),ylab("values")) +
-        theme_light() +
-        scale_color_discrete(name_l) +
-        xlab(name_x) +
-        ylab(name_y) +
-        labs(fill = name_l) +
-        geom_boxplot(notch = notched) +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75)) +
-        stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
-    } else {
-      
-      box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name]),ylab("values")) +
-        theme_light() +
-        scale_color_discrete(name_l) +
-        xlab(name_x) +
-        ylab(name_y) +
-        labs(fill = name_l) +
-        geom_boxplot(notch = notched) +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
-        stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
-    }
+    box_comp <- box_comp +
+      geom_boxplot(notch = notched) +
+      geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75)) +
+      stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
   } else {
     
     my_comparison <- combn(unique(as.character(data[,group_name])),2,simplify = FALSE)
     
-    if (aditional_grouping){
-      
-      box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
-        theme_light() +
-        scale_color_discrete(name_l) +
-        xlab(name_x) +
-        ylab(name_y) +
-        labs(fill = name_l) +
-        geom_boxplot(notch = notched) +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75)) +
-        stat_compare_means(method = "t.test", comparisons = my_comparison) +
-        stat_compare_means(label.y =(max(data[,values_name]+3/6*max(data[,values_name]))))
-    } else {
-      
-      box_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
-        theme_light() +
-        scale_color_discrete(name_l) +
-        xlab(name_x) +
-        ylab(name_y) +
-        labs(fill = name_l) +
-        geom_boxplot(notch = notched) +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
-        stat_compare_means(method = "t.test", comparisons = my_comparison) +
-        stat_compare_means(label.y =(max(data[,values_name]+3/6*max(data[,values_name]))))
-    }
+    box_comp <- box_comp +
+      geom_boxplot(notch = notched) +
+      geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
+      stat_compare_means(method = "t.test", comparisons = my_comparison) +
+      stat_compare_means(label.y =(max(data[,values_name]+3/6*max(data[,values_name]))))
+    
     print("The t-test done between each group do not take account of a variance test, thus it might be interpreted carefully.",col = "red")
   }
   return(box_comp)
@@ -144,22 +134,12 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE,
     if(!is.factor(data[,aditional_grouping_name])){stop("aditional_grouping parameter must be a factor")}
   }
   
-  ## recuperation of the labels
+  ## generation of the spine of the plot
   
-  if(is.character(values_name)){name_y <- values_name} else {name_y <- colnames(data)[values_name]}
-  if(is.character(group_name)){
-    name_x <- group_name
-    name_l <- group_name
-  } else {
-    name_x <- colnames(data)[group_name]
-    name_l <- colnames(data)[group_name]
-  }
   if(aditional_grouping){
-    if(is.character(aditional_grouping_name)){
-      name_l <- aditional_grouping_name
-    } else {
-      name_l <- colnames(data)[aditional_grouping_name]
-    }
+    vio_comp <- basePlot(data,values_name,group_name, aditional_grouping = TRUE, aditional_grouping_name = aditional_grouping_name)
+  } else {
+    vio_comp <- basePlot(data,values_name,group_name, aditional_grouping = FALSE, aditional_grouping_name = NA)
   }
   
   ## Create violin plot
@@ -169,120 +149,42 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE,
     varres <- var.test(data[,values_name][data[,group_name] == 0], data[,values_name][data[,group_name] ==1])[[3]]
     if (varres > 0.05 ){tres <- TRUE} else {tres <- FALSE}
     
-    if(aditional_grouping){
-      if(box){
-        
-        vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
-          theme_light() +
-          scale_color_discrete(name_l) +
-          labs(fill = name_l) +
-          xlab(name_x) +
-          ylab(name_y) +
-          geom_violin() +
-          geom_boxplot(width = 0.1,position =  position_dodge(0.90)) +
-          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
-          stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
-      } else {
-        
-        vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
-          theme_light() +
-          scale_color_discrete(name_l) +
-          labs(fill = name_l) +
-          xlab(name_x) +
-          ylab(name_y) +
-          geom_violin() +
-          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
-          stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
-      }
+    if(box){
+      
+      vio_comp <- vio_comp +
+        geom_violin() +
+        geom_boxplot(width = 0.1,position =  position_dodge(0.90)) +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
+        stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
     } else {
-      if(box){
-        
-        vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
-          theme_light() +
-          scale_color_discrete(name_l) +
-          labs(fill = name_l) +
-          xlab(name_x) +
-          ylab(name_y) +
-          geom_violin() +
-          geom_boxplot(width = 0.1,position =  position_dodge(0.90)) +
-          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
-          stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
-      } else {
-        
-        vio_comp <- ggplot(df, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
-          theme_light() +
-          scale_color_discrete(name_l) +
-          labs(fill = name_l) +
-          xlab(name_x) +
-          ylab(name_y) +
-          geom_violin() +
-          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
-          stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
-      }
+      
+      vio_comp <- vio_comp +
+        geom_violin() +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
+        stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
     }
   } else {
     
     my_comparison <- combn(unique(as.character(data[,group_name])),2,simplify = FALSE)
     
-    if(aditional_grouping){
-      if(box) {
-        
-        vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
-          theme_light() +
-          scale_color_discrete(name_l) +
-          labs(fill = name_l) +
-          xlab(name_x) +
-          ylab(name_y) +
-          geom_violin() +
-          geom_boxplot(width = 0.1,position =  position_dodge(0.90)) +
-          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10, position =  position_dodge(0.90)) +
-          stat_compare_means(method = "t.test", comparisons = my_comparison) +
-          stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
-        
-      } else {
-        
-        vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
-          theme_light() +
-          scale_color_discrete(name_l) +
-          labs(fill = name_l) +
-          xlab(name_x) +
-          ylab(name_y) +
-          geom_violin() +
-          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position =  position_dodge(0.90)) +
-          stat_compare_means(method = "t.test", comparisons = my_comparison) +
-          stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
-      }
+    if(box) {
+      
+      vio_comp <- vio_comp +
+        geom_violin() +
+        geom_boxplot(width = 0.1,position =  position_dodge(0.90)) +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
+        stat_compare_means(method = "t.test", comparisons = my_comparison) +
+        stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
+      
     } else {
-      if(box) {
-        
-        vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
-          theme_light() +
-          scale_color_discrete(name_l) +
-          labs(fill = name_l) +
-          xlab(name_x) +
-          ylab(name_y) +
-          geom_violin() +
-          geom_boxplot(width = 0.1,position =  position_dodge(0.90)) +
-          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
-          stat_compare_means(method = "t.test", comparisons = my_comparison) +
-          stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
-        
-      } else {
-        
-        vio_comp <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
-          theme_light() +
-          scale_color_discrete(name_l) +
-          labs(fill = name_l) +
-          xlab(name_x) +
-          ylab(name_y) +
-          geom_violin() +
-          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
-          stat_compare_means(method = "t.test", comparisons = my_comparison) +
-          stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
-      }
+      
+      vio_comp <- vio_comp +
+        geom_violin() +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
+        stat_compare_means(method = "t.test", comparisons = my_comparison) +
+        stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
     }
     print("The t-test done between each group do not take account of a variance test, thus it might be interpreted carefully.",col = "red")
-    
   }
   return(vio_comp)
 }
