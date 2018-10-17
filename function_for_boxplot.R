@@ -116,7 +116,7 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
 # two_group indicate if you have two or more group in the dataset
 # box indicate if you want to add a boxplot inside the violin
 
-imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE, aditional_grouping = FALSE, aditional_grouping_name = NA){
+imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE, dot = FALSE,aditional_grouping = FALSE, aditional_grouping_name = NA){
   
   # Loading the require package if not
   
@@ -126,7 +126,7 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE,
   ## check input parameters ##
   
   if(!is.data.frame(data)){stop("data parameters must be a dataFrame")}
-  if(!is.factor(data[,group_name])){stop("group column must be a vectorType")}
+  if(!is.factor(data[,group_name])){stop("group column must be a factor")}
   if( !is.logical(two_group) ){stop("two_group parameter must a logical")}
   if( !is.logical(box)){stop("box parameter must a logical")}
   if(!is.logical(aditional_grouping)){stop("aditional_grouping parameter must be a logical")}
@@ -136,7 +136,7 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE,
   
   ## generation of the spine of the plot
   
-  if(aditional_grouping){
+  if(aditional_grouping)
     vio_comp <- basePlot(data,values_name,group_name, aditional_grouping = TRUE, aditional_grouping_name = aditional_grouping_name)
   } else {
     vio_comp <- basePlot(data,values_name,group_name, aditional_grouping = FALSE, aditional_grouping_name = NA)
@@ -149,41 +149,25 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE,
     varres <- var.test(data[,values_name][data[,group_name] == 0], data[,values_name][data[,group_name] ==1])[[3]]
     if (varres > 0.05 ){tres <- TRUE} else {tres <- FALSE}
     
-    if(box){
-      
-      vio_comp <- vio_comp +
-        geom_violin() +
-        geom_boxplot(width = 0.1,position =  position_dodge(0.90)) +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
-        stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
-    } else {
-      
-      vio_comp <- vio_comp +
-        geom_violin() +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
-        stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
-    }
+    vio_comp <- vio_comp +
+      geom_violin() +
+      stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
+    
+    if(box){ vio_comp <- vio_comp + geom_boxplot(width = 0.1,position =  position_dodge(0.90))
+    if(dot) vio_comp <- vio_comp + geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90))
+    
   } else {
     
     my_comparison <- combn(unique(as.character(data[,group_name])),2,simplify = FALSE)
     
-    if(box) {
-      
-      vio_comp <- vio_comp +
-        geom_violin() +
-        geom_boxplot(width = 0.1,position =  position_dodge(0.90)) +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
-        stat_compare_means(method = "t.test", comparisons = my_comparison) +
-        stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
-      
-    } else {
-      
-      vio_comp <- vio_comp +
-        geom_violin() +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90)) +
-        stat_compare_means(method = "t.test", comparisons = my_comparison) +
-        stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
-    }
+    vio_comp <- vio_comp +
+      stat_compare_means(method = "t.test", comparisons = my_comparison) +
+      stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
+    
+    
+    if(box) vio_comp <- vio_comp + geom_boxplot(width = 0.1,position =  position_dodge(0.90))
+    if(dot) vio_comp <- vio_comp + geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90))
+
     print("The t-test done between each group do not take account of a variance test, thus it might be interpreted carefully.",col = "red")
   }
   return(vio_comp)
