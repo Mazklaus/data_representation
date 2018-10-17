@@ -2,7 +2,7 @@
 ##### Utilitary function #####
 #============================#
 
-basePlot <- function(data,values_name,group_name, aditional_grouping = FALSE, aditional_grouping_name = NA){
+basePlot <- function(data,values_name,group_name, aditional_grouping_name = NA){
   
   ## recuperation of the labels
   
@@ -13,6 +13,11 @@ basePlot <- function(data,values_name,group_name, aditional_grouping = FALSE, ad
   } else {
     name_x <- colnames(data)[group_name]
     name_l <- colnames(data)[group_name]
+  }
+  if(!is.na(aditional_grouping_name)){
+    aditional_grouping = TRUE
+  } else {
+    aditional_grouping = FALSE
   }
   if(aditional_grouping){
     if(is.character(aditional_grouping_name)){
@@ -55,7 +60,7 @@ basePlot <- function(data,values_name,group_name, aditional_grouping = FALSE, ad
 # two_group indicate if you have two or more group in the dataset
 # notched indicate if you prefer notch plot rather than boxplot
 
-imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = FALSE, aditional_grouping = FALSE, aditional_grouping_name = NA){
+imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA, two_group = TRUE, notched = FALSE){
   
   # Loading the require package if not
   
@@ -68,18 +73,13 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
   if(!is.factor(data[,group_name])){stop("group column must be a factor")}
   if( !is.logical(two_group) ){stop("two_group parameter must a logical")}
   if( !is.logical(notched) ){stop("notched parameter must a logical")}
-  if(!is.logical(aditional_grouping)){stop("aditional_grouping parameter must be a logical")}
   if(!is.na(aditional_grouping_name)){
     if(!is.factor(data[,aditional_grouping_name])){stop("aditional_grouping parameter must be a factor")}
   }
   
   ## generation of the spine of the plot
   
-  if(aditional_grouping){
-  box_comp <- basePlot(data,values_name,group_name, aditional_grouping = TRUE, aditional_grouping_name = aditional_grouping_name)
-  } else {
-  box_comp <- basePlot(data,values_name,group_name, aditional_grouping = FALSE, aditional_grouping_name = NA)
-  }
+  box_comp <- basePlot(data,values_name,group_name, aditional_grouping_name = aditional_grouping_name)
   
   ## Create boxplot
   
@@ -116,7 +116,7 @@ imBplot <- function(data, values_name, group_name, two_group = TRUE, notched = F
 # two_group indicate if you have two or more group in the dataset
 # box indicate if you want to add a boxplot inside the violin
 
-imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE, dot = FALSE,aditional_grouping = FALSE, aditional_grouping_name = NA){
+imVplot <- function(data, values_name, group_name, aditional_grouping_name = NA, two_group = TRUE, box = TRUE, dot = FALSE){
   
   # Loading the require package if not
   
@@ -129,7 +129,6 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE,
   if(!is.factor(data[,group_name])){stop("group column must be a factor")}
   if( !is.logical(two_group) ){stop("two_group parameter must a logical")}
   if( !is.logical(box)){stop("box parameter must a logical")}
-  if(!is.logical(aditional_grouping)){stop("aditional_grouping parameter must be a logical")}
   if(!is.na(aditional_grouping_name)){
     if(!is.factor(data[,aditional_grouping_name])){stop("aditional_grouping parameter must be a factor")}
   }
@@ -153,7 +152,7 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE,
       geom_violin() +
       stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
     
-    if(box){ vio_comp <- vio_comp + geom_boxplot(width = 0.1,position =  position_dodge(0.90))
+    if(box) vio_comp <- vio_comp + geom_boxplot(width = 0.1,position =  position_dodge(0.90))
     if(dot) vio_comp <- vio_comp + geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.90))
     
   } else {
@@ -179,7 +178,7 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE,
 #============================#
 
 
-dataG <- function(nrow, ngroup = 2, secondary_group = FALSE, nsecondary_group = NA, groupAsFactor = TRUE, forceDif = FALSE){
+dataG <- function(nrow, ngroup = 2, nsecondary_group = NA, groupAsFactor = TRUE, forceDif = FALSE){
   
   # check parameters
   
@@ -187,8 +186,8 @@ dataG <- function(nrow, ngroup = 2, secondary_group = FALSE, nsecondary_group = 
   if(ngroup <= 1 | !is.numeric(ngroup) | ngroup%%1 != 0){stop("ngroup parameter must be an integer greater or equal to 2")}
   if( !is.logical(groupAsFactor) ){stop("groupAsFactor parameter must a logical")}
   if( !is.logical(forceDif) ){stop("forceDif parameter must a logical")}
-  if(!is.logical(secondary_group)){stop("secondary_group parameter must be a logical")}
   if(!is.na(nsecondary_group)){
+    secondary_group = TRUE
     if(nsecondary_group <= 1 | !is.numeric(nsecondary_group) | nsecondary_group%%1 != 0){stop("nsecondary_group parameter must be an integer greater or equal to 2")}
   }
   
