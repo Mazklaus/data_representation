@@ -136,7 +136,7 @@ imVplot <- function(data, values_name, group_name, two_group = TRUE, box = TRUE,
   
   ## generation of the spine of the plot
   
-  if(aditional_grouping)
+  if(aditional_grouping){
     vio_comp <- basePlot(data,values_name,group_name, aditional_grouping = TRUE, aditional_grouping_name = aditional_grouping_name)
   } else {
     vio_comp <- basePlot(data,values_name,group_name, aditional_grouping = FALSE, aditional_grouping_name = NA)
