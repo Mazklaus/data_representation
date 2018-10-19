@@ -177,8 +177,8 @@ dstat <- function(data,quant,qual){
   ## check input
   
   if(!is.data.frame(data)){stop("data parameters must be a data frame")}
-  if(!is.numeric(quant) | !is.character(quant)){stop("quant paramater must be a single or a vector of character or numerical values indicating quantitative column")}
-  if(!is.numeric(qual) | !is.character(qual)){stop("qual paramater must be a single or a vector of character or numerical values indicating qualitative column")}
+  if(!is.numeric(quant) & !is.character(quant)){stop("quant paramater must be a single/vector of character/numerical values indicating quantitative column")}
+  if(!is.numeric(qual) & !is.character(qual)){stop("qual paramater must be a single/vector of character/numerical values indicating qualitative column")}
   
   ## gathering and printing informations
   
