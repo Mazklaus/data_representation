@@ -40,11 +40,14 @@ nicePrint <- function(data, tab_length = 6, rowNames = TRUE){
         vect <- vect[!is.na(vect)]
         val <- str_length(vect[1])
       }
-      if(tab_length <= val){ ## i need to adapt the code to take how much it's longer to be sure to not colide
+      if((tab_length*2) <= val){
+        ref_tab[i+1] <- (val+2)
+      } else if(tab_length <= val){
         ref_tab[i+1] <- 2*tab_length
       } else {
         ref_tab[i+1] <- tab_length
       }
+      print(ref_tab)
     }
     for (i in 1:nrow(data)) {
       for (y in 0:length(columnNames)) {
@@ -63,7 +66,9 @@ nicePrint <- function(data, tab_length = 6, rowNames = TRUE){
       vect <- data[str_length(data[,i]) == max(str_length(data[,i]),na.rm = TRUE),i]
       vect <- vect[!is.na(vect)]
       val <- str_length(vect[1])
-      if(tab_length <= val){ ## i need to adapt the code to take how much it's longer to be sure to not colide
+      if((tab_length*2) <= val){
+        ref_tab[i] <- (val+2)
+      } else if(tab_length <= val){
         ref_tab[i] <- 2*tab_length
       } else {
         ref_tab[i] <- tab_length
