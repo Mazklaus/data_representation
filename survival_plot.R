@@ -155,14 +155,17 @@ nicePrint <- function(data, tab_length = 6, rowNames = TRUE, colNames = TRUE){
 dstat <- function(data,quant,qual){
   
   y <- 0
-  quant_frame <- data_frame("variable","mean","variance")
+  quant_frame <- data_frame("variable","mean","min","max","median","number_NA")
   print("Quantitative data :")
   for (i in quant) {
     y <- y +1
     if(is.character(i)){varname <- i} else {varname <- colnames(data)[i]}
-    quant_frame[y,] <- c(varname,round(mean(data[,i]),2),round(var(data[,i]),2))
+    quant_frame[y,] <- c(varname,round(mean(data[,i],na.rm = TRUE),2),min(data[,i],na.rm = TRUE),max(data[,i],na.rm = TRUE),median(data[,i],na.rm = TRUE),sum(is.na(data[,i])))
   }
   nicePrint(as.data.frame(quant_frame))
+  cat("\n")
+  cat("\n")
+  cat("\n")
   cat("\n")
   print("Qualitative data :")
   for (i in qual) {
@@ -176,6 +179,8 @@ dstat <- function(data,quant,qual){
     colnames(temp) <- as.character(levels(data[,i]))
     rownames(temp) <- varname
     nicePrint(temp)
+    cat("\n")
+    cat("\n")
   }
 }
 
