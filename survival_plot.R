@@ -1,14 +1,25 @@
+#=========================#
+##### Example dataset #####
+#=========================#
+
 ## load library
 
 library(survival)
-library(survminer)
-library(stringr)
 
 ## load dataset example
 
 data(lung)
 
-## Descriptiver stat
+#==================#
+##### function #####
+#==================#
+
+## utilitary stand alone pinting function
+
+##data is a dataframe
+## tab length is the number of blank you want between each column
+## rowNames indicate wether or not you want to print rownames
+## colNames indicate wether or not you want to print colnames
 
 nicePrint <- function(data, tab_length = 6, rowNames = TRUE, colNames = TRUE){
   
@@ -152,7 +163,24 @@ nicePrint <- function(data, tab_length = 6, rowNames = TRUE, colNames = TRUE){
   }
 }
 
+## Basic descriptive stat function
+## data is a dataframe
+## quant is a character/numeric single/vector indicating the quantitative column
+## qual is a character/numeric single/vector indicating the qualitative column
+
 dstat <- function(data,quant,qual){
+  
+  ## load packages
+  
+  require(dplyr)
+  
+  ## check input
+  
+  if(!is.data.frame(data)){stop("data parameters must be a data frame")}
+  if(!is.numeric(quant) | !is.character(quant)){stop("quant paramater must be a single or a vector of character or numerical values indicating quantitative column")}
+  if(!is.numeric(qual) | !is.character(qual)){stop("qual paramater must be a single or a vector of character or numerical values indicating qualitative column")}
+  
+  ## gathering and printing informations
   
   y <- 0
   quant_frame <- data_frame("variable","mean","min","max","median","number_NA")
@@ -183,6 +211,10 @@ dstat <- function(data,quant,qual){
     cat("\n")
   }
 }
+
+#===============================================#
+##### Automated survival plot (in progress) #####
+#===============================================#
 
 ## fit cox model
 
