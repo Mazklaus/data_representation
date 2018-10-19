@@ -30,7 +30,6 @@ nicePrint <- function(data, tab_length = 6, rowNames = TRUE, colNames = TRUE){
   data <- data %>% mutate_all(as.character)
   ref_tab <- c()
   
-  
   if(colNames){ 
     
     if(rowNames){
@@ -155,21 +154,28 @@ nicePrint <- function(data, tab_length = 6, rowNames = TRUE, colNames = TRUE){
 
 dstat <- function(data,quant,qual){
   
+  y <- 0
+  quant_frame <- data_frame("variable","mean","variance")
   print("Quantitative data :")
   for (i in quant) {
+    y <- y +1
     if(is.character(i)){varname <- i} else {varname <- colnames(data)[i]}
-    print(varname)
-    print(mean(data[,i]))
-    print(var(data[,i]))
+    quant_frame[y,] <- c(varname,round(mean(data[,i]),2),round(var(data[,i]),2))
   }
+  nicePrint(as.data.frame(quant_frame))
+  cat("\n")
+  print("Qualitative data :")
   for (i in qual) {
     if(is.character(i)){varname <- i} else {varname <- colnames(data)[i]}
     data[,i] <- as.factor(data[,i])
-    print(varname)
+    percent <- c()
     for (y in levels(data[,i])) {
-      print(y)
-      print(nrow(data[data[,i]==y,])/nrow(data)*100)
+      percent[y] <- paste(round(nrow(data[data[,i]==y,])/nrow(data)*100,2),"%",sep=" ")
     }
+    temp <- as.data.frame(t(as.data.frame(percent)))
+    colnames(temp) <- as.character(levels(data[,i]))
+    rownames(temp) <- varname
+    nicePrint(temp)
   }
 }
 
