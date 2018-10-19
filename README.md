@@ -10,6 +10,6 @@ It requires at least R version 3.5 to work.
 
 # survival_plot
 
-This is a work in progress file which have been realsed because it contain two very usefull function : \n
-nicePrint : a printing function for dataframes witch allow you to choose tabulation size \n
+This is a work in progress file which have been realsed because it contain two very usefull function :
+nicePrint : a printing function for dataframes witch allow you to choose tabulation size
 dstat : a function witch gives you basic descriptive statistic for your dataframe
