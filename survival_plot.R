@@ -10,7 +10,7 @@ data(lung)
 
 ## Descriptiver stat
 
-nicePrint <- function(data, tab_length = 6, rowNames = TRUE){
+nicePrint <- function(data, tab_length = 6, rowNames = TRUE, colNames = TRUE){
   
   ## required package
   
@@ -31,54 +31,123 @@ nicePrint <- function(data, tab_length = 6, rowNames = TRUE){
   ref_tab <- c()
   
   
-  if(rowNames){
-    for (i in seq(0,(length(columnNames)))) {
-      if(i == 0){
-        val <- max(str_length(lineNames))
-      } else {
-        vect <- data[str_length(data[,i]) == max(str_length(data[,i]),na.rm = TRUE),i]
-        vect <- vect[!is.na(vect)]
-        val <- str_length(vect[1])
-      }
-      if((tab_length*2) <= val){
-        ref_tab[i+1] <- (val+2)
-      } else if(tab_length <= val){
-        ref_tab[i+1] <- 2*tab_length
-      } else {
-        ref_tab[i+1] <- tab_length
-      }
-      print(ref_tab)
-    }
-    for (i in 1:nrow(data)) {
-      for (y in 0:length(columnNames)) {
-        if(y == 0){
-          cat(lineNames[i],strrep(" ",ref_tab[y+1]-str_length(lineNames[i])))
+  if(colNames){ 
+    
+    if(rowNames){
+      for (i in seq(0,(length(columnNames)))) {
+        if(i == 0){
+          val <- max(str_length(lineNames))
         } else {
-          if(is.na(data[i,y])) ret <- 2 else ret <- str_length(data[i,y])
-          cat(data[i,y],strrep(" ",ref_tab[y+1]-ret))
+          vect <- data[str_length(data[,i]) == max(str_length(data[,i]),na.rm = TRUE),i]
+          vect <- vect[!is.na(vect)]
+          val <- max(c(str_length(vect[1]),max(str_length(columnNames[i]))))
         }
-        if(y == length(columnNames)) cat("\n")
+        if((tab_length*2) <= val){
+          ref_tab[i+1] <- (val+2)
+        } else if(tab_length <= val){
+          ref_tab[i+1] <- 2*tab_length
+        } else {
+          ref_tab[i+1] <- tab_length
+        }
+      }
+      for (i in 0:nrow(data)) {
+        for (y in 0:length(columnNames)) {
+          if(y == 0){
+            if(i == 0){
+              cat(strrep(" ",(ref_tab[y+1]+1)))
+            } else {
+              cat(lineNames[i],strrep(" ",ref_tab[y+1]-str_length(lineNames[i])))
+            }
+          } else {
+            if(i == 0){
+              cat(columnNames[y],strrep(" ",ref_tab[y+1]-str_length(columnNames[y])))
+            } else {
+              if(is.na(data[i,y])) ret <- 2 else ret <- str_length(data[i,y])
+              cat(data[i,y],strrep(" ",ref_tab[y+1]-ret))
+            }
+          }
+          
+          if(y == length(columnNames)) cat("\n")
+        }
+      }
+      
+    } else {
+      for (i in seq(1,length(columnNames))) {
+        vect <- data[str_length(data[,i]) == max(str_length(data[,i]),na.rm = TRUE),i] ## opti make this art a function one #B
+        vect <- vect[!is.na(vect)]
+        val <- max(c(str_length(vect[1]),max(str_length(columnNames[i]))))
+        if((tab_length*2) <= val){
+          ref_tab[i] <- (val+2)
+        } else if(tab_length <= val){
+          ref_tab[i] <- 2*tab_length
+        } else {
+          ref_tab[i] <- tab_length
+        } #E
+      }
+      for (i in 0:nrow(data)) {
+        for (y in 1:length(columnNames)) {
+          if(i == 0){
+            cat(columnNames[y],strrep(" ",ref_tab[y]-str_length(columnNames[y])))
+          } else {
+            if(is.na(data[i,y])) ret <- 2 else ret <- str_length(data[i,y])
+            cat(data[i,y],strrep(" ",ref_tab[y+1]-ret))
+          }
+          if(y == length(columnNames)) cat("\n")
+        }
       }
     }
     
   } else {
-    for (i in seq(1,length(columnNames))) {
-      vect <- data[str_length(data[,i]) == max(str_length(data[,i]),na.rm = TRUE),i]
-      vect <- vect[!is.na(vect)]
-      val <- str_length(vect[1])
-      if((tab_length*2) <= val){
-        ref_tab[i] <- (val+2)
-      } else if(tab_length <= val){
-        ref_tab[i] <- 2*tab_length
-      } else {
-        ref_tab[i] <- tab_length
+    
+    if(rowNames){
+      for (i in seq(0,(length(columnNames)))) {
+        if(i == 0){
+          val <- max(str_length(lineNames))
+        } else {
+          vect <- data[str_length(data[,i]) == max(str_length(data[,i]),na.rm = TRUE),i]
+          vect <- vect[!is.na(vect)]
+          val <- str_length(vect[1])
+        }
+        if((tab_length*2) <= val){
+          ref_tab[i+1] <- (val+2)
+        } else if(tab_length <= val){
+          ref_tab[i+1] <- 2*tab_length
+        } else {
+          ref_tab[i+1] <- tab_length
+        }
+        print(ref_tab)
       }
-    }
-    for (i in 1:nrow(data)) {
-      for (y in 1:length(columnNames)) {
-        if(is.na(data[i,y])) ret <- 2 else ret <- str_length(data[i,y])
-        cat(data[i,y],strrep(" ",ref_tab[y]-ret))
-        if(y == length(columnNames)) cat("\n")
+      for (i in 1:nrow(data)) {
+        for (y in 0:length(columnNames)) {
+          if(y == 0){
+            cat(lineNames[i],strrep(" ",ref_tab[y+1]-str_length(lineNames[i])))
+          } else {
+            if(is.na(data[i,y])) ret <- 2 else ret <- str_length(data[i,y])
+            cat(data[i,y],strrep(" ",ref_tab[y+1]-ret))
+          }
+          if(y == length(columnNames)) cat("\n")
+        }
+      }
+      
+    } else {
+      for (i in seq(1,length(columnNames))) {
+        vect <- data[str_length(data[,i]) == max(str_length(data[,i]),na.rm = TRUE),i] ## opti make this art a function one #B
+        vect <- vect[!is.na(vect)]
+        val <- str_length(vect[1])
+        if((tab_length*2) <= val){
+          ref_tab[i] <- (val+2)
+        } else if(tab_length <= val){
+          ref_tab[i] <- 2*tab_length
+        } else {
+          ref_tab[i] <- tab_length
+        } #E
+      }
+      for (i in 1:nrow(data)) {
+        for (y in 1:length(columnNames)) {
+          if(is.na(data[i,y])) ret <- 2 else ret <- str_length(data[i,y])
+          cat(data[i,y],strrep(" ",ref_tab[y]-ret))
+          if(y == length(columnNames)) cat("\n")
+        }
       }
     }
   }
