@@ -84,7 +84,7 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
   ## Create boxplot
   
   if(two_group){
-    varres <- var.test(data[,values_name][data[,group_name] == 0], data[,values_name][data[,group_name] ==1])[[3]]
+    varres <- var.test(data[,values_name][data[,group_name] == levels(data[,group_name])[1]], data[,values_name][data[,group_name] == levels(data[,group_name])[2]])[[3]]
     if (varres > 0.05 ){tres <- TRUE} else {tres <- FALSE}
     
     box_comp <- box_comp +
@@ -135,17 +135,17 @@ imVplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
   
   ## generation of the spine of the plot
   
-  if(aditional_grouping){
-    vio_comp <- basePlot(data,values_name,group_name, aditional_grouping = TRUE, aditional_grouping_name = aditional_grouping_name)
+  if(!is.na(aditional_grouping_name)){
+    vio_comp <- basePlot(data,values_name,group_name, aditional_grouping_name = aditional_grouping_name)
   } else {
-    vio_comp <- basePlot(data,values_name,group_name, aditional_grouping = FALSE, aditional_grouping_name = NA)
+    vio_comp <- basePlot(data,values_name,group_name, aditional_grouping_name = NA)
   }
   
   ## Create violin plot
   
   if(two_group){
     
-    varres <- var.test(data[,values_name][data[,group_name] == 0], data[,values_name][data[,group_name] ==1])[[3]]
+    varres <- var.test(data[,values_name][data[,group_name] == levels(data[,group_name])[1]], data[,values_name][data[,group_name] == levels(data[,group_name])[2]])[[3]]# adpat it to automatically put group with 0 in the script
     if (varres > 0.05 ){tres <- TRUE} else {tres <- FALSE}
     
     vio_comp <- vio_comp +
