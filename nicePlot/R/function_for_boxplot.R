@@ -32,12 +32,12 @@ basePlot <- function(data,values_name,group_name, aditional_grouping_name = NA){
 
   if(aditional_grouping){
 
-  basep <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
-    theme_light() +
-    scale_color_discrete(name_l) +
-    xlab(name_x) +
-    ylab(name_y) +
-    labs(fill = name_l)
+    basep <- ggplot(data, aes(data[,group_name],data[,values_name], fill = data[,aditional_grouping_name])) +
+      theme_light() +
+      scale_color_discrete(name_l) +
+      xlab(name_x) +
+      ylab(name_y) +
+      labs(fill = name_l)
   } else {
 
     basep <- ggplot(data, aes(data[,group_name],data[,values_name], color = data[,group_name])) +
@@ -62,7 +62,7 @@ basePlot <- function(data,values_name,group_name, aditional_grouping_name = NA){
 # two_group indicate if you have two or more group in the dataset
 # notched indicate if you prefer notch plot rather than boxplot
 
-imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA, two_group = TRUE, notched = FALSE){
+imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA, two_group = TRUE, notched = FALSE, dot = TRUE){
 
   # Loading the require package if not
 
@@ -75,6 +75,7 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
   if(!is.factor(data[,group_name])){stop("group column must be a factor")}
   if( !is.logical(two_group) ){stop("two_group parameter must a logical")}
   if( !is.logical(notched) ){stop("notched parameter must a logical")}
+  if( !is.logical(dot) ){stop("dot parameter must a logical")}
   if(!is.na(aditional_grouping_name)){
     if(!is.factor(data[,aditional_grouping_name])){stop("aditional_grouping parameter must be a factor")}
   }
@@ -91,17 +92,27 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 
     box_comp <- box_comp +
       geom_boxplot(notch = notched) +
-      geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75)) +
       stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
+
+    if(dot){
+      box_comp <- box_comp +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75))
+
+    }
   } else {
 
     my_comparison <- combn(unique(as.character(data[,group_name])),2,simplify = FALSE)
 
     box_comp <- box_comp +
       geom_boxplot(notch = notched) +
-      geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10) +
       stat_compare_means(method = "t.test", comparisons = my_comparison) +
       stat_compare_means(label.y =(max(data[,values_name]+3/6*max(data[,values_name]))))
+
+    if(dot){
+      box_comp <- box_comp +
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10)
+
+    }
 
     print("The t-test done between each group do not take account of a variance test, thus it might be interpreted carefully.",col = "red")
   }
