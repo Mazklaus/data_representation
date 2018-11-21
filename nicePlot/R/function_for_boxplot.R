@@ -5,6 +5,11 @@
 
 basePlot <- function(data,values_name,group_name, aditional_grouping_name = NA){
 
+  ## get needeed packages ##
+
+  require(ggplot2)
+  require(ggpubr)
+
   ## recuperation of the labels
 
   if(is.character(values_name)){name_y <- values_name} else {name_y <- colnames(data)[values_name]}
@@ -62,7 +67,7 @@ basePlot <- function(data,values_name,group_name, aditional_grouping_name = NA){
 # two_group indicate if you have two or more group in the dataset
 # notched indicate if you prefer notch plot rather than boxplot
 
-imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA, two_group = TRUE, notched = FALSE, dot = TRUE){
+imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA, notched = FALSE, dot = TRUE){
 
   # Loading the require package if not
 
@@ -73,7 +78,6 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 
   if(!is.data.frame(data)){stop("data parameters must be a dataFrame")}
   if(!is.factor(data[,group_name])){stop("group column must be a factor")}
-  if( !is.logical(two_group) ){stop("two_group parameter must a logical")}
   if( !is.logical(notched) ){stop("notched parameter must a logical")}
   if( !is.logical(dot) ){stop("dot parameter must a logical")}
   if(!is.na(aditional_grouping_name)){
@@ -86,7 +90,7 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 
   ## Create boxplot
 
-  if(two_group){
+  if(length(levels(data[,group_name])) == 2){
     varres <- var.test(data[,values_name][data[,group_name] == levels(data[,group_name])[1]], data[,values_name][data[,group_name] == levels(data[,group_name])[2]])[[3]]
     if (varres > 0.05 ){tres <- TRUE} else {tres <- FALSE}
 
@@ -130,7 +134,7 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 # two_group indicate if you have two or more group in the dataset
 # box indicate if you want to add a boxplot inside the violin
 
-imVplot <- function(data, values_name, group_name, aditional_grouping_name = NA, two_group = TRUE, box = TRUE, dot = FALSE){
+imVplot <- function(data, values_name, group_name, aditional_grouping_name = NA, box = TRUE, dot = FALSE){
 
   # Loading the require package if not
 
@@ -141,7 +145,6 @@ imVplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 
   if(!is.data.frame(data)){stop("data parameters must be a dataFrame")}
   if(!is.factor(data[,group_name])){stop("group column must be a factor")}
-  if( !is.logical(two_group) ){stop("two_group parameter must a logical")}
   if( !is.logical(box)){stop("box parameter must a logical")}
   if(!is.na(aditional_grouping_name)){
     if(!is.factor(data[,aditional_grouping_name])){stop("aditional_grouping parameter must be a factor")}
@@ -157,7 +160,7 @@ imVplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 
   ## Create violin plot
 
-  if(two_group){
+  if(length(levels(data[,group_name])) == 2){
 
     varres <- var.test(data[,values_name][data[,group_name] == levels(data[,group_name])[1]], data[,values_name][data[,group_name] == levels(data[,group_name])[2]])[[3]]# adpat it to automatically put group with 0 in the script
     if (varres > 0.05 ){tres <- TRUE} else {tres <- FALSE}
@@ -201,8 +204,10 @@ dataG <- function(nrow, ngroup = 2, nsecondary_group = NA, groupAsFactor = TRUE,
   if( !is.logical(groupAsFactor) ){stop("groupAsFactor parameter must a logical")}
   if( !is.logical(forceDif) ){stop("forceDif parameter must a logical")}
   if(!is.na(nsecondary_group)){
-    secondary_group = TRUE
+    secondary_group <- TRUE
     if(nsecondary_group <= 1 | !is.numeric(nsecondary_group) | nsecondary_group%%1 != 0){stop("nsecondary_group parameter must be an integer greater or equal to 2")}
+  } else {
+    secondary_group <- FALSE
   }
 
   # creation of the dataset
