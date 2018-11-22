@@ -114,9 +114,10 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 
     if(dot){
       box_comp <- box_comp +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 2/10)
+        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75))
 
     }
+
 
     print("The t-test done between each group do not take account of a variance test, thus it might be interpreted carefully.",col = "red")
   }
@@ -177,6 +178,7 @@ imVplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
     my_comparison <- combn(unique(as.character(data[,group_name])),2,simplify = FALSE)
 
     vio_comp <- vio_comp +
+      geom_violin() +
       stat_compare_means(method = "t.test", comparisons = my_comparison) +
       stat_compare_means(label.y =(max(data[,values_name])+3/6*max(data[,values_name])))
 
