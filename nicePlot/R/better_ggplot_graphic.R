@@ -7,8 +7,8 @@ changeStrip <- function(gplot, color_swap, color_pallet = NULL){
 
   ## get the required packages
 
-  required("ggplot2")
-  required("grid")
+  require("ggplot2")
+  require("grid")
 
   if(!is.vector(color_swap)){
     stop("color_swap must be a vector of length")
