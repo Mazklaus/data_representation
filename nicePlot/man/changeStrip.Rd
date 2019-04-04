@@ -14,7 +14,7 @@
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{gplot}{The ggplot from you want to change the strip color.}
-  \item{color_swap}{a vector having the same length as the number of panel containing numerical (1 to x). This will be used to choose where to apply the color.}
+  \item{color_swap}{a vector having the same length as the number of panel containing numericals, integers or factors (1 to x). This will be used to choose where to apply the color.}
   \item{color_pallet}{Optional argument to give colors. If not given they will be choose randomly.}
   %%     ~~Describe \code{x} here~~
 }
