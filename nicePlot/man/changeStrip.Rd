@@ -29,8 +29,9 @@
   %% ~put references to the literature/web site here ~
 }
 \author{
-  Abel Garnier
-  GitHub : Mazklaus
+  Abel Garnier & Venceslas Douillard (GitHub : Mazklaus)
+
+
 }
 \note{
   %%  ~~further notes~~
