@@ -1,4 +1,4 @@
-change_strip <- function (gplot, color_swap, color_pallet = NULL) 
+change_strip <- function (gplot, color_swap, color_pallet = NULL)
 {
   require("ggplot2")
   require("grid")
@@ -7,7 +7,7 @@ change_strip <- function (gplot, color_swap, color_pallet = NULL)
   }
   if (is.null(color_pallet)) {
     number_col <- length(unique(color_swap))
-    color <- grDevices::colors()[grep("gr(a|e)y", grDevices::colors(), 
+    color <- grDevices::colors()[grep("gr(a|e)y", grDevices::colors(),
                                       invert = T)]
     color <- unique(sub(color, pattern = "[0-9]+", replacement = ""))
     col <- sample(x = color, size = number_col)
@@ -18,13 +18,12 @@ change_strip <- function (gplot, color_swap, color_pallet = NULL)
   col_vect <- c()
   for (i in seq(1, length(color_swap))) {
     col_vect[i] <- col[color_swap[i]]
-    print(col_vect[i])
   }
   stripped_plot <- ggplotGrob(gplot)
   strip_both <- which(grepl("strip-", stripped_plot$layout$name))
   fills <- col_vect
   k <- 1
-  
+
   toRm <- c()
   for (i in strip_both) { ## remove unused panel
     if(is.null(stripped_plot$grobs[[i]]$grobs[[1]])){
@@ -32,13 +31,13 @@ change_strip <- function (gplot, color_swap, color_pallet = NULL)
     }
     k <- k + 1
   }
-  
+
   if(!is.null(toRm)){
     strip_both <- strip_both[-which(strip_both %in% toRm)]
   }
-  
+
   strip_both <- strip_both[order(gsub(pattern="strip-t-([0-9])-([0-9])", replacement = "strip-t-\\2-\\1", stripped_plot$layout$name[strip_both], perl=T))]
-  
+
   k <- 1
   for (i in strip_both) {
     j <- which(grepl("rect", stripped_plot$grobs[[i]]$grobs[[1]]$childrenOrder))
