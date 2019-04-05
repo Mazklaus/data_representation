@@ -23,7 +23,6 @@ changeStrip <- function (gplot, color_swap, color_pallet = NULL)
   col_vect <- c()
   for (i in seq(1, length(color_swap))) {
     col_vect[i] <- col[color_swap[i]]
-    print(col_vect[i])
   }
   stripped_plot <- ggplotGrob(gplot)
   strip_both <- which(grepl("strip-", stripped_plot$layout$name))
