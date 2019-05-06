@@ -18,10 +18,12 @@ imBplot(data, values_name, group_name, aditional_grouping_name = NA, notched = F
   \item{aditional_grouping_name}{another factor column to group for}
 \item{notched}{A logical indicating wether or not you prefer get notched box rather than simple box plot. Default is FALSE}
 \item{dot}{A logical indicating wether or not you want the point to appear on the graph. This help appreciating the distribution. Default is TRUE}
+\item{pval}{A logical indicating wether or not you want to print the p-value on the graph. P-values printed that are  under 2.2e-16 will be printed as <2.2e-16. Default is TRUE}
 }
 
 \details{
 %%  ~~ If necessary, more details than the description above ~~
+If you choose to print the p-value, it will be calculated as a simple two-sided t-test using the "t.test" function. It will consider your data as if they are not paired with more than 30 observations in each group. This corresponding to a classical t-test with normality assumption. If it is not the case in your data you must turn off this paramaters as it give you wrong p-values.
 }
 \value{
 The output of the function is a ggplot object containing all the boxplot.You can stock it or just use the functionto print the plot in the plot panel.

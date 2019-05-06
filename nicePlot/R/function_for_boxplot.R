@@ -1,3 +1,7 @@
+#' @import ggplot2
+#' @import ggpubr
+
+
 #============================#
 ##### Utilitary function #####
 #============================#
@@ -67,7 +71,7 @@ basePlot <- function(data,values_name,group_name, aditional_grouping_name = NA){
 # two_group indicate if you have two or more group in the dataset
 # notched indicate if you prefer notch plot rather than boxplot
 
-imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA, notched = FALSE, dot = TRUE){
+imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA, notched = FALSE, dot = TRUE,pval = TRUE){
 
   # Loading the require package if not
 
@@ -78,8 +82,9 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 
   if(!is.data.frame(data)){stop("data parameters must be a dataFrame")}
   if(!is.factor(data[,group_name])){stop("group column must be a factor")}
-  if( !is.logical(notched) ){stop("notched parameter must a logical")}
-  if( !is.logical(dot) ){stop("dot parameter must a logical")}
+  if( !is.logical(notched) ){stop("notched parameter must be a logical")}
+  if( !is.logical(dot) ){stop("dot parameter must be a logical")}
+  if( !is.logical(pval) ){stop("pval parameter must be a logical")}
   if(!is.na(aditional_grouping_name)){
     if(!is.factor(data[,aditional_grouping_name])){stop("aditional_grouping parameter must be a factor")}
   }
@@ -90,36 +95,48 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 
   ## Create boxplot
 
-  if(length(levels(data[,group_name])) == 2){
-    varres <- var.test(data[,values_name][data[,group_name] == levels(data[,group_name])[1]], data[,values_name][data[,group_name] == levels(data[,group_name])[2]])[[3]]
-    if (varres > 0.05 ){tres <- TRUE} else {tres <- FALSE}
+  if(pval){
+    if(length(levels(data[,group_name])) == 2){
+      varres <- var.test(data[,values_name][data[,group_name] == levels(data[,group_name])[1]], data[,values_name][data[,group_name] == levels(data[,group_name])[2]])[[3]]
+      if (varres > 0.05 ){tres <- TRUE} else {tres <- FALSE}
 
-    box_comp <- box_comp +
-      geom_boxplot(notch = notched) +
-      stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
-
-    if(dot){
       box_comp <- box_comp +
-        geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75))
+        geom_boxplot(notch = notched) +
+        stat_compare_means(method = "t.test", method.args = list(var.equal = tres),label.y = (max(data[,values_name])+1/6*max(data[,values_name])))
 
+      if(dot){
+        box_comp <- box_comp +
+          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75))
+
+      }
+    } else {
+
+      my_comparison <- combn(unique(as.character(data[,group_name])),2,simplify = FALSE)
+
+      box_comp <- box_comp +
+        geom_boxplot(notch = notched) +
+        stat_compare_means(method = "t.test", comparisons = my_comparison) +
+        stat_compare_means(label.y =(max(data[,values_name]+3/6*max(data[,values_name]))))
+
+      if(dot){
+        box_comp <- box_comp +
+          geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75))
+
+      }
+
+
+      print("The t-test done between each group do not take account of a variance test, thus it might be interpreted carefully.",col = "red")
     }
   } else {
 
-    my_comparison <- combn(unique(as.character(data[,group_name])),2,simplify = FALSE)
-
     box_comp <- box_comp +
-      geom_boxplot(notch = notched) +
-      stat_compare_means(method = "t.test", comparisons = my_comparison) +
-      stat_compare_means(label.y =(max(data[,values_name]+3/6*max(data[,values_name]))))
+      geom_boxplot(notch = notched)
 
     if(dot){
       box_comp <- box_comp +
         geom_dotplot(binaxis='y', stackdir='center', dotsize=.7,aes(color = NULL),alpha = 7/10,position = position_dodge(0.75))
 
     }
-
-
-    print("The t-test done between each group do not take account of a variance test, thus it might be interpreted carefully.",col = "red")
   }
   return(box_comp)
 }
@@ -136,7 +153,7 @@ imBplot <- function(data, values_name, group_name, aditional_grouping_name = NA,
 # box indicate if you want to add a boxplot inside the violin
 
 imVplot <- function(data, values_name, group_name, aditional_grouping_name = NA, box = TRUE, dot = FALSE){
-
+  r
   # Loading the require package if not
 
   require(ggplot2)

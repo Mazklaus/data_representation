@@ -1,9 +1,10 @@
 Package: nicePlot
 Title: builting enhanced ggplot2 graph
-Version: 0.9.8
+Version: 1.0.0
 Authors@R: c(person("Abel", "Garnier", email = "abel.garnier@univ-nantes.fr", role = c("aut", "cre")),person("Venceslas", "Douillard", email = "venceslas.douillard@univ-nantes.fr", role = c("ctb")))
 Description: This package regroup many function that provides a simple interface to realise ggplot grpahics. For now only boxplot and violin plot are supported.
 Depends: R (>= 3.5.1)
+Imports: ggplot2, ggpubr
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
